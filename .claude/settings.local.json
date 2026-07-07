@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(brew upgrade:*)",
+      "Bash(mkdir -p public/icons && cp src/assets/icons/*.png public/icons/ && ls public/icons)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "mcp__claude-in-chrome__list_connected_browsers",
+      "Bash(curl -s http://localhost:4173/popup.html)",
+      "Bash(cp -r /Users/sudarshan/Desktop/Linkedin_CE/dist/* /private/tmp/claude-501/-Users-sudarshan-Desktop-Linkedin-CE/82d9f04e-c319-47f5-9cbc-806d2467bac6/scratchpad/ext-preview/)",
+      "Bash(python3 -)",
+      "Bash(npx vite *)",
+      "Bash(curl -sI http://localhost:4173/preview.js)",
+      "Bash(curl -sI http://localhost:4173/preview.html)",
+      "Bash(cd /Users/sudarshan/Desktop/Linkedin_CE *)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(npx eslint *)",
+      "Bash(echo \"exit code: $?\")",
+      "Bash(rm -rf /private/tmp/claude-501/-Users-sudarshan-Desktop-Linkedin-CE/82d9f04e-c319-47f5-9cbc-806d2467bac6/scratchpad/ext-preview/*)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 /private/tmp/claude-501/-Users-sudarshan-Desktop-Linkedin-CE/82d9f04e-c319-47f5-9cbc-806d2467bac6/scratchpad/fix_bom.py)"
+    ]
+  }
+}

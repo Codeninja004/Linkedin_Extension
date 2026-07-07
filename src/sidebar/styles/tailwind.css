@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * This stylesheet is injected two different ways:
+ *  1. As a real <link>/import on popup.html and dashboard.html, where
+ *     `html`/`body` below are real elements.
+ *  2. As an inline <style> inside the sidebar's Shadow DOM (see
+ *     SidebarController.ts), where `:host` refers to the shadow host div
+ *     injected into the LinkedIn page.
+ *
+ * `:host { all: initial }` is the standard defense against inherited
+ * properties (font-family, color, line-height, etc.) leaking in from
+ * LinkedIn's own page styles through the host element. Our own Tailwind
+ * utility classes already set these explicitly almost everywhere, but this
+ * guarantees a clean baseline regardless — the sidebar should look
+ * identical no matter what LinkedIn's CSS does. It's a no-op outside a
+ * shadow root, so it's safe to ship in the shared stylesheet.
+ */
+:host {
+  all: initial;
+  display: block;
+}
+
+@layer base {
+  html,
+  body {
+    @apply antialiased;
+  }
+}
+
+@layer components {
+  .lcrm-card {
+    @apply rounded-xl bg-white dark:bg-neutral-900 shadow-card border border-neutral-200/70 dark:border-neutral-800;
+  }
+
+  .lcrm-section-title {
+    @apply text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400;
+  }
+
+  .lcrm-input {
+    @apply w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2.5 text-base text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 transition-colors;
+  }
+
+  .lcrm-select {
+    @apply lcrm-input appearance-none bg-no-repeat pr-8 cursor-pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-position: right 0.6rem center;
+    background-size: 16px 16px;
+  }
+
+  .lcrm-btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-2 text-base font-medium
+      transition-all duration-150 ease-out
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-900
+      active:scale-[0.97]
+      disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+  }
+
+  .lcrm-btn-primary {
+    @apply lcrm-btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
+  }
+
+  .lcrm-btn-secondary {
+    @apply lcrm-btn bg-neutral-100 text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700;
+  }
+
+  .lcrm-btn-ghost {
+    @apply lcrm-btn bg-transparent text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-neutral-200;
+  }
+
+  .lcrm-chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-sm font-medium;
+  }
+
+  .lcrm-chip-remove {
+    @apply ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full leading-none opacity-60 transition-all hover:opacity-100 hover:bg-black/10 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-current;
+  }
+
+  .lcrm-scrollbar {
+    scrollbar-width: thin;
+  }
+
+  .lcrm-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .lcrm-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 dark:bg-neutral-700 rounded-full;
+  }
+
+  .lcrm-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
