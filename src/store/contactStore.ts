@@ -23,8 +23,10 @@ interface ContactState {
   loadAllContacts: () => Promise<void>;
   /** Looks up whether this profile is already on the list; if not, stages it as `pendingProfile` instead of creating anything. */
   detectProfile: (profile: LinkedInProfileData) => Promise<void>;
-  /** Persists `pendingProfile` as a new tracked contact — the only place a Contact gets created. */
-  addPendingProfileToList: () => Promise<Contact | null>;
+  /** Persists `pendingProfile` as a new tracked contact — the only place a Contact gets created. `listIds` are the lists chosen in the add-to-profile dropdown. */
+  addPendingProfileToList: (listIds?: string[]) => Promise<Contact | null>;
+  /** Loads an already-tracked contact into the store and makes it active (used by the Dashboard's lead-details drawer). */
+  openContact: (contact: Contact) => void;
   clearActiveContact: () => void;
 
   // Every mutation below takes an explicit `contactId` rather than reading
@@ -40,6 +42,8 @@ interface ContactState {
   setTemperature: (contactId: string, temperature: Temperature) => Promise<void>;
   addTag: (contactId: string, tagId: string, tagName: string) => Promise<void>;
   removeTag: (contactId: string, tagId: string, tagName: string) => Promise<void>;
+  addToList: (contactId: string, listId: string, listName: string) => Promise<void>;
+  removeFromList: (contactId: string, listId: string, listName: string) => Promise<void>;
   updateNoteLocal: (contactId: string, content: string) => void;
   persistNote: (contactId: string, content: string) => Promise<void>;
   setReminder: (contactId: string, input: SetReminderInput) => Promise<void>;
@@ -88,19 +92,22 @@ export const useContactStore = create<ContactState>((set, get) => ({
     }
   },
 
-  addPendingProfileToList: async () => {
+  addPendingProfileToList: async (listIds = []) => {
     const profile = get().pendingProfile;
     if (!profile) return null;
 
     set({ isLoading: true });
     try {
-      const created = await contactService.createContactFromProfile(profile);
+      const created = await contactService.createContactFromProfile(profile, listIds);
       set((s) => ({ contacts: upsert(s.contacts, created), activeContactId: created.id, pendingProfile: null }));
       return created;
     } finally {
       set({ isLoading: false });
     }
   },
+
+  openContact: (contact) =>
+    set((s) => ({ contacts: upsert(s.contacts, contact), activeContactId: contact.id, pendingProfile: null })),
 
   clearActiveContact: () => set({ activeContactId: null, pendingProfile: null }),
 
@@ -126,6 +133,16 @@ export const useContactStore = create<ContactState>((set, get) => ({
 
   removeTag: async (contactId, tagId, tagName) => {
     const updated = await contactService.removeTagFromContact(contactId, tagId, tagName);
+    if (updated) set((s) => ({ contacts: upsert(s.contacts, updated) }));
+  },
+
+  addToList: async (contactId, listId, listName) => {
+    const updated = await contactService.addListToContact(contactId, listId, listName);
+    if (updated) set((s) => ({ contacts: upsert(s.contacts, updated) }));
+  },
+
+  removeFromList: async (contactId, listId, listName) => {
+    const updated = await contactService.removeListFromContact(contactId, listId, listName);
     if (updated) set((s) => ({ contacts: upsert(s.contacts, updated) }));
   },
 

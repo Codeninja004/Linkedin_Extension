@@ -1,4 +1,4 @@
-import type { BackupPayload, Contact, Tag, Template, Settings } from '@/types';
+import type { BackupPayload, Contact, ContactList, Tag, Template, Settings } from '@/types';
 
 function isString(v: unknown): v is string {
   return typeof v === 'string';
@@ -36,6 +36,11 @@ function isValidTag(value: unknown): value is Tag {
   return isString(value.id) && isString(value.name) && isString(value.color);
 }
 
+function isValidList(value: unknown): value is ContactList {
+  if (!isObject(value)) return false;
+  return isString(value.id) && isString(value.name) && isString(value.color);
+}
+
 function isValidTemplate(value: unknown): value is Template {
   if (!isObject(value)) return false;
   return isString(value.id) && isString(value.name) && isString(value.content);
@@ -66,9 +71,17 @@ export function validateBackupPayload(raw: unknown): { valid: true; data: Backup
 
   const { data } = raw;
   const { contacts, tags, templates, settings } = data as Record<string, unknown>;
+  // `lists` was added after the first release, so older backups won't have
+  // it — treat a missing lists collection as an empty one rather than
+  // rejecting the whole backup.
+  const lists = (data as Record<string, unknown>).lists ?? {};
 
   if (!isObject(contacts) || !Object.values(contacts).every(isValidContact)) {
     return { valid: false, error: 'Backup contains invalid or corrupted contact records.' };
+  }
+
+  if (!isObject(lists) || !Object.values(lists).every(isValidList)) {
+    return { valid: false, error: 'Backup contains invalid or corrupted list records.' };
   }
 
   if (!isObject(tags) || !Object.values(tags).every(isValidTag)) {
@@ -90,6 +103,7 @@ export function validateBackupPayload(raw: unknown): { valid: true; data: Backup
       exportedAt: typeof raw.exportedAt === 'string' ? raw.exportedAt : new Date().toISOString(),
       data: {
         contacts: contacts as Record<string, Contact>,
+        lists: lists as Record<string, ContactList>,
         tags: tags as Record<string, Tag>,
         templates: templates as Record<string, Template>,
         settings,

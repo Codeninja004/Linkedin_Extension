@@ -47,6 +47,7 @@ const CSV_HEADERS = [
   'Stage',
   'Priority',
   'Temperature',
+  'Lists',
   'Tags',
   'Note',
   'Reminder Date',
@@ -64,8 +65,13 @@ const CSV_HEADERS = [
  */
 export async function exportContactsToCsv(): Promise<boolean> {
   try {
-    const [contacts, tags] = await Promise.all([StorageService.getContacts(), StorageService.getTags()]);
+    const [contacts, tags, lists] = await Promise.all([
+      StorageService.getContacts(),
+      StorageService.getTags(),
+      StorageService.getLists(),
+    ]);
     const tagNameById = new Map(tags.map((t) => [t.id, t.name]));
+    const listNameById = new Map(lists.map((l) => [l.id, l.name]));
 
     const rows = contacts.map((c) => [
       c.name,
@@ -76,6 +82,7 @@ export async function exportContactsToCsv(): Promise<boolean> {
       PIPELINE_STAGE_LABELS[c.stage],
       PRIORITY_LABELS[c.priority],
       TEMPERATURE_LABELS[c.temperature],
+      (c.listIds ?? []).map((id) => listNameById.get(id)).filter(Boolean).join('; '),
       c.tagIds.map((id) => tagNameById.get(id)).filter(Boolean).join('; '),
       c.note.content,
       c.reminder.date ?? '',

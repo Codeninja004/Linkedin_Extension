@@ -28,6 +28,40 @@
   body {
     @apply antialiased;
   }
+
+  /*
+   * shadcn/ui "sidebar" design tokens (HSL triplets consumed via
+   * hsl(var(--sidebar-*)) — see the `sidebar` colors in tailwind.config.js).
+   * The neutral surfaces come straight from shadcn; the primary/ring accents
+   * are tuned to LinkedIn blue so the sidebar still reads as part of this
+   * product. Only used by the Dashboard's <Sidebar>, which lives in the light
+   * DOM, so scoping these to :root / .dark is sufficient.
+   */
+  :root {
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 210 90% 40%; /* LinkedIn blue #0A66C2-ish */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 210 90% 45%;
+  }
+
+  .dark {
+    --sidebar-background: 200 12% 13%; /* ~#1D2226 */
+    --sidebar-foreground: 210 14% 83%;
+    --sidebar-primary: 205 92% 71%; /* LinkedIn light blue #70B5F9 */
+    --sidebar-primary-foreground: 200 12% 13%;
+    --sidebar-accent: 204 10% 19%; /* ~#2D3339 */
+    --sidebar-accent-foreground: 210 14% 90%;
+    --sidebar-border: 205 10% 26%; /* ~#3A4149 */
+    --sidebar-ring: 205 92% 71%;
+  }
+
+  .font-geist {
+    font-family: 'Geist Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
 }
 
 @layer components {
@@ -59,7 +93,8 @@
   }
 
   .lcrm-btn-primary {
-    @apply lcrm-btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
+    @apply lcrm-btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800
+      dark:bg-brand-400 dark:text-neutral-950 dark:hover:bg-brand-200 dark:active:bg-brand-300;
   }
 
   .lcrm-btn-secondary {

@@ -1,4 +1,5 @@
 import type { Contact } from './contact';
+import type { ContactList } from './list';
 import type { Tag } from './tag';
 import type { Template } from './template';
 import type { Settings } from './settings';
@@ -10,6 +11,7 @@ import type { Settings } from './settings';
  */
 export interface StorageSchema {
   contacts: Record<string, Contact>;
+  lists: Record<string, ContactList>;
   tags: Record<string, Tag>;
   templates: Record<string, Template>;
   settings: Settings;
@@ -17,6 +19,7 @@ export interface StorageSchema {
 
 export const STORAGE_KEYS: Record<keyof StorageSchema, keyof StorageSchema> = {
   contacts: 'contacts',
+  lists: 'lists',
   tags: 'tags',
   templates: 'templates',
   settings: 'settings',

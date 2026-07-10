@@ -81,6 +81,8 @@ export interface Contact extends LinkedInProfileData {
   priority: Priority;
   temperature: Temperature;
   tagIds: string[];
+  /** Ids of the lists (target audiences) this contact belongs to. */
+  listIds: string[];
   note: ContactNote;
   reminder: Reminder;
   activities: Activity[];

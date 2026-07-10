@@ -9,6 +9,7 @@ import {
   NoteIcon,
   PlusIcon,
   TagIcon,
+  UsersIcon,
   ZapIcon,
 } from './icons';
 import { useContactStore } from '@/store/contactStore';
@@ -21,6 +22,8 @@ const ACTIVITY_ICON: Record<ActivityType, JSX.Element> = {
   temperature_changed: <ZapIcon />,
   tag_added: <TagIcon />,
   tag_removed: <TagIcon />,
+  list_added: <UsersIcon />,
+  list_removed: <UsersIcon />,
   note_updated: <NoteIcon />,
   reminder_created: <BellIcon />,
   reminder_completed: <CheckIcon />,

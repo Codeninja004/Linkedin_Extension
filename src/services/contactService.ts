@@ -34,8 +34,16 @@ export async function findContactForProfile(profile: LinkedInProfileData): Promi
   return refreshed;
 }
 
-/** Explicitly creates a new tracked contact from scraped profile data — only called when the user clicks "Add Profile to List". */
-export async function createContactFromProfile(profile: LinkedInProfileData): Promise<Contact> {
+/**
+ * Explicitly creates a new tracked contact from scraped profile data — only
+ * called when the user clicks "Add Profile to List". `listIds` seeds the
+ * lists (target audiences) the contact starts out in, chosen from the
+ * add-to-profile dropdown.
+ */
+export async function createContactFromProfile(
+  profile: LinkedInProfileData,
+  listIds: string[] = []
+): Promise<Contact> {
   const now = nowIso();
 
   let created: Contact = {
@@ -45,6 +53,7 @@ export async function createContactFromProfile(profile: LinkedInProfileData): Pr
     priority: 'medium',
     temperature: 'warm',
     tagIds: [],
+    listIds: [...listIds],
     note: { content: '', lastEdited: null },
     reminder: createEmptyReminder(),
     activities: [],
@@ -56,6 +65,36 @@ export async function createContactFromProfile(profile: LinkedInProfileData): Pr
   created = withActivity(created, 'profile_created', `Added ${profile.name || 'this profile'} to the list.`);
   await StorageService.saveContact(created);
   return created;
+}
+
+export async function addListToContact(contactId: string, listId: string, listName: string): Promise<Contact | null> {
+  const contact = await StorageService.getContact(contactId);
+  if (!contact) return null;
+  const listIds = contact.listIds ?? [];
+  if (listIds.includes(listId)) return contact;
+
+  const updated = withActivity(
+    { ...contact, listIds: [...listIds, listId], updatedAt: nowIso() },
+    'list_added',
+    `Added to list "${listName}".`
+  );
+  await StorageService.saveContact(updated);
+  return updated;
+}
+
+export async function removeListFromContact(contactId: string, listId: string, listName: string): Promise<Contact | null> {
+  const contact = await StorageService.getContact(contactId);
+  if (!contact) return null;
+  const listIds = contact.listIds ?? [];
+  if (!listIds.includes(listId)) return contact;
+
+  const updated = withActivity(
+    { ...contact, listIds: listIds.filter((l) => l !== listId), updatedAt: nowIso() },
+    'list_removed',
+    `Removed from list "${listName}".`
+  );
+  await StorageService.saveContact(updated);
+  return updated;
 }
 
 export async function setStage(contactId: string, stage: PipelineStage): Promise<Contact | null> {

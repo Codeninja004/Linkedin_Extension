@@ -2,7 +2,7 @@ import type { Contact, Tag } from '@/types';
 import { PIPELINE_STAGE_LABELS, PRIORITY_LABELS } from '@/types/contact';
 import type { SortDir, SortKey } from '../hooks/useContactsFilter';
 import { Chip } from '@/sidebar/components/Chip';
-import { ChevronDownIcon, TrashIcon } from '@/sidebar/components/icons';
+import { ChevronDownIcon, TrashIcon, ExternalLinkIcon } from '@/sidebar/components/icons';
 import { formatRelativeTime } from '@/utils/date';
 import { cn } from '@/utils/classnames';
 
@@ -13,6 +13,7 @@ interface ContactsTableProps {
   sortDir: SortDir;
   onSort: (key: SortKey) => void;
   onOpenProfile: (url: string) => void;
+  onView: (contact: Contact) => void;
   onDelete: (id: string) => void;
 }
 
@@ -85,6 +86,7 @@ export function ContactsTable({
   sortDir,
   onSort,
   onOpenProfile,
+  onView,
   onDelete,
 }: ContactsTableProps) {
   const tagById = new Map(tags.map((t) => [t.id, t]));
@@ -114,15 +116,12 @@ export function ContactsTable({
               key={contact.id}
               tabIndex={0}
               className="cursor-pointer outline-none hover:bg-neutral-50 focus-visible:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500/50 dark:hover:bg-neutral-800/50 dark:focus-visible:bg-neutral-800/50"
-              onClick={() => onOpenProfile(contact.linkedinUrl)}
+              onClick={() => onView(contact)}
               onKeyDown={(e) => {
-                // Ignore keydowns bubbling up from focusable children (e.g.
-                // the delete button) — only the row itself being focused
-                // and activated should open the profile.
                 if (e.target !== e.currentTarget) return;
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onOpenProfile(contact.linkedinUrl);
+                  onView(contact);
                 }
               }}
             >
@@ -165,19 +164,33 @@ export function ContactsTable({
                 {formatRelativeTime(contact.lastViewed)}
               </td>
               <td className="px-3 py-2.5">
-                <button
-                  type="button"
-                  className="lcrm-btn-ghost !p-1.5 text-red-500"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (confirm(`Delete ${contact.name || 'this contact'}? This cannot be undone.`)) {
-                      onDelete(contact.id);
-                    }
-                  }}
-                  aria-label={`Delete ${contact.name}`}
-                >
-                  <TrashIcon />
-                </button>
+                <div className="flex items-center justify-end gap-1">
+                  <button
+                    type="button"
+                    className="lcrm-btn-ghost !p-1.5 text-neutral-400 hover:text-brand-600 dark:hover:text-brand-400"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenProfile(contact.linkedinUrl);
+                    }}
+                    aria-label={`Open ${contact.name || 'this contact'}'s LinkedIn profile`}
+                    title="Open LinkedIn profile"
+                  >
+                    <ExternalLinkIcon />
+                  </button>
+                  <button
+                    type="button"
+                    className="lcrm-btn-ghost !p-1.5 text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm(`Delete ${contact.name || 'this contact'}? This cannot be undone.`)) {
+                        onDelete(contact.id);
+                      }
+                    }}
+                    aria-label={`Delete ${contact.name}`}
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

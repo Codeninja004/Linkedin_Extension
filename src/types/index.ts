@@ -1,4 +1,5 @@
 export * from './contact';
+export * from './list';
 export * from './activity';
 export * from './reminder';
 export * from './tag';

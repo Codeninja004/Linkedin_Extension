@@ -11,7 +11,9 @@ import type { ThemePreference } from '@/types';
 export function useAppliedTheme(): void {
   useEffect(() => {
     const media = window.matchMedia('(prefers-color-scheme: dark)');
-    let currentTheme: ThemePreference = 'system';
+    // Default to light until the stored preference resolves, so first paint
+    // is never a dark flash on machines whose OS is set to dark mode.
+    let currentTheme: ThemePreference = 'light';
 
     const apply = () => {
       const isDark = currentTheme === 'dark' || (currentTheme === 'system' && media.matches);

@@ -4,10 +4,15 @@ import type { Contact, PipelineStage, Priority } from '@/types';
 export type SortKey = 'name' | 'company' | 'stage' | 'priority' | 'lastViewed';
 export type SortDir = 'asc' | 'desc';
 
+/** Sentinel `listId` value that matches contacts belonging to no list at all. */
+export const UNCATEGORIZED = '__uncategorized__';
+
 export interface DashboardFilters {
   stage: PipelineStage | 'all';
   priority: Priority | 'all';
   tagId: string | 'all';
+  /** A list id, `'all'` for every contact, or `UNCATEGORIZED` for contacts in no list. */
+  listId: string | 'all';
   company: string | 'all';
   keyword: string;
 }
@@ -16,6 +21,7 @@ const DEFAULT_FILTERS: DashboardFilters = {
   stage: 'all',
   priority: 'all',
   tagId: 'all',
+  listId: 'all',
   company: 'all',
   keyword: '',
 };
@@ -55,6 +61,11 @@ export function useContactsFilter(contacts: Contact[]) {
       if (filters.stage !== 'all' && c.stage !== filters.stage) return false;
       if (filters.priority !== 'all' && c.priority !== filters.priority) return false;
       if (filters.tagId !== 'all' && !c.tagIds.includes(filters.tagId)) return false;
+      if (filters.listId === UNCATEGORIZED) {
+        if ((c.listIds ?? []).length > 0) return false;
+      } else if (filters.listId !== 'all' && !(c.listIds ?? []).includes(filters.listId)) {
+        return false;
+      }
       if (filters.company !== 'all' && c.company !== filters.company) return false;
       if (
         keyword &&

@@ -17,7 +17,8 @@ interface UIState {
  */
 export const useUIStore = create<UIState>((set) => ({
   isSidebarOpen: true,
-  isDarkMode: typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches,
+  // Default to light mode; the sidebar's own toggle button flips it per session.
+  isDarkMode: false,
 
   setSidebarOpen: (open) => set({ isSidebarOpen: open }),
   setDarkMode: (dark) => set({ isDarkMode: dark }),

@@ -1,6 +1,7 @@
 import type { Contact } from '@/types';
 import { ContactHeader } from '../components/ContactHeader';
 import { PipelineSection } from '../components/PipelineSection';
+import { ListsSection } from '../components/ListsSection';
 import { TagsSection } from '../components/TagsSection';
 import { NotesSection } from '../components/NotesSection';
 import { ReminderSection } from '../components/ReminderSection';
@@ -13,6 +14,7 @@ export function ProfilePage({ contact }: { contact: Contact }) {
     <>
       <ContactHeader profile={contact} />
       <PipelineSection contact={contact} />
+      <ListsSection contact={contact} />
       <TagsSection contact={contact} />
       <NotesSection contact={contact} />
       <ReminderSection contact={contact} />

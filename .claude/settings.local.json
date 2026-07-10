@@ -19,7 +19,13 @@
       "Bash(echo \"exit code: $?\")",
       "Bash(rm -rf /private/tmp/claude-501/-Users-sudarshan-Desktop-Linkedin-CE/82d9f04e-c319-47f5-9cbc-806d2467bac6/scratchpad/ext-preview/*)",
       "Bash(python3 -c ' *)",
-      "Bash(python3 /private/tmp/claude-501/-Users-sudarshan-Desktop-Linkedin-CE/82d9f04e-c319-47f5-9cbc-806d2467bac6/scratchpad/fix_bom.py)"
+      "Bash(python3 /private/tmp/claude-501/-Users-sudarshan-Desktop-Linkedin-CE/82d9f04e-c319-47f5-9cbc-806d2467bac6/scratchpad/fix_bom.py)",
+      "PowerShell(npm run build)",
+      "Bash(rm -f .claude/launch.json; echo \"checking dist freshness:\"; ls -la dist/content.js 2>/dev/null; echo \"---handler present?---\"; grep -c \"Add Profile to List\" dist/content.js 2>/dev/null; echo \"---dist age vs src---\"; stat -c '%y %n' dist/content.js src/sidebar/pages/PendingProfilePage.tsx 2>/dev/null)",
+      "Bash(node -e \"console.log\\('tailwind', require\\('tailwindcss/package.json'\\).version\\)\")",
+      "Bash(node -e \"console.log\\('vite', require\\('vite/package.json'\\).version\\)\")",
+      "Bash(rm -f src/dashboard/components/ListsSidebar.tsx)",
+      "Bash(node -e ' *)"
     ]
   }
 }

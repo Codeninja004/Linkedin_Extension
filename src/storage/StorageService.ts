@@ -1,5 +1,6 @@
 import type {
   Contact,
+  ContactList,
   Tag,
   Template,
   Settings,
@@ -95,6 +96,43 @@ class StorageServiceImpl {
   }
 
   // ---------------------------------------------------------------------
+  // Lists
+  // ---------------------------------------------------------------------
+
+  async getLists(): Promise<ContactList[]> {
+    const lists = await this.getRecord('lists', {});
+    return Object.values(lists);
+  }
+
+  async getList(id: string): Promise<ContactList | null> {
+    const lists = await this.getRecord('lists', {});
+    return lists[id] ?? null;
+  }
+
+  async saveList(list: ContactList): Promise<void> {
+    const lists = await this.getRecord('lists', {});
+    lists[list.id] = list;
+    await this.setRecord('lists', lists);
+  }
+
+  async deleteList(id: string): Promise<void> {
+    const lists = await this.getRecord('lists', {});
+    delete lists[id];
+    await this.setRecord('lists', lists);
+
+    // Cascade: strip the deleted list id from every contact that referenced it.
+    const contacts = await this.getRecord('contacts', {});
+    let touched = false;
+    for (const contact of Object.values(contacts)) {
+      if (contact.listIds?.includes(id)) {
+        contact.listIds = contact.listIds.filter((l) => l !== id);
+        touched = true;
+      }
+    }
+    if (touched) await this.setRecord('contacts', contacts);
+  }
+
+  // ---------------------------------------------------------------------
   // Tags
   // ---------------------------------------------------------------------
 
@@ -164,8 +202,9 @@ class StorageServiceImpl {
   // ---------------------------------------------------------------------
 
   async exportAll(): Promise<BackupPayload> {
-    const [contactsList, tagsList, templatesList, settings] = await Promise.all([
+    const [contactsList, listsList, tagsList, templatesList, settings] = await Promise.all([
       this.getContacts(),
+      this.getLists(),
       this.getTags(),
       this.getTemplates(),
       this.getSettings(),
@@ -176,6 +215,7 @@ class StorageServiceImpl {
       exportedAt: new Date().toISOString(),
       data: {
         contacts: Object.fromEntries(contactsList.map((c) => [c.id, c])),
+        lists: Object.fromEntries(listsList.map((l) => [l.id, l])),
         tags: Object.fromEntries(tagsList.map((t) => [t.id, t])),
         templates: Object.fromEntries(templatesList.map((t) => [t.id, t])),
         settings,
@@ -187,6 +227,7 @@ class StorageServiceImpl {
   async importAll(payload: BackupPayload): Promise<void> {
     await Promise.all([
       this.setRecord('contacts', payload.data.contacts),
+      this.setRecord('lists', payload.data.lists),
       this.setRecord('tags', payload.data.tags),
       this.setRecord('templates', payload.data.templates),
       this.setRecord('settings', payload.data.settings),

@@ -147,14 +147,7 @@ export function scrapeProfileFromDom(): LinkedInProfileData {
     ])
   );
 
-  const company = textOf(
-    query([
-      'button[aria-label*="Current company"] .pv-text-details__right-panel-item-text',
-      '.pv-text-details__right-panel-item-text',
-      '[data-field="experience_company_logo"] + div .t-14.t-black--light span[aria-hidden="true"]',
-      'section#experience ~ div li .t-bold span[aria-hidden="true"]',
-    ])
-  ) || extractCompanyFromHeadline(headline);
+  const company = resolveCompany(headline);
 
   const photoEl = query([
     '.pv-top-card-profile-picture__image',
@@ -183,8 +176,50 @@ export function scrapeProfileFromDom(): LinkedInProfileData {
   };
 }
 
-/** Best-effort fallback: headlines are often formatted "Role at Company". */
+/**
+ * Resolves the current company through several strategies, most reliable
+ * first. LinkedIn renames its top-card class names constantly, so the
+ * primary signal is the "Current company" button's `aria-label` (stable,
+ * human-readable text), with class-based selectors and the headline as
+ * fallbacks.
+ */
+function resolveCompany(headline: string): string {
+  return (
+    extractCompanyFromAriaLabel() ||
+    textOf(
+      query([
+        // Current top-card markup: the company sits as text/aria-hidden span
+        // inside the "Current company" button (which also holds the logo).
+        'button[aria-label*="Current company"] span[aria-hidden="true"]',
+        'button[aria-label*="Current company"]',
+        'a[aria-label*="Current company"]',
+        // Older markup kept as a fallback.
+        '.pv-text-details__right-panel-item-text',
+        '[data-field="experience_company_logo"] + div .t-14.t-black--light span[aria-hidden="true"]',
+      ])
+    ) ||
+    extractCompanyFromHeadline(headline)
+  );
+}
+
+/**
+ * Parses the company out of the top card's "Current company" control, whose
+ * `aria-label` reads like: "Current company: Acme Corp. Click to skip to
+ * experience card." — structure-independent, so it survives class renames.
+ */
+function extractCompanyFromAriaLabel(): string {
+  const el = document.querySelector('[aria-label*="Current company"]');
+  const label = el?.getAttribute('aria-label') ?? '';
+  const match = label.match(/current company:\s*(.+)/i);
+  if (!match) return '';
+  return match[1]
+    .replace(/\.?\s*click to skip.*$/i, '') // drop the trailing call-to-action
+    .replace(/\.\s*$/, '')
+    .trim();
+}
+
+/** Best-effort fallback: headlines are often formatted "Role at Company". Stops at the first separator so "…at Acme | Ex-Google" yields just "Acme". */
 function extractCompanyFromHeadline(headline: string): string {
-  const match = headline.match(/\bat\s+(.+)$/i);
+  const match = headline.match(/\bat\s+([^|•·–—]+)/i);
   return match ? match[1].trim() : '';
 }

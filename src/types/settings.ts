@@ -8,7 +8,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  theme: 'system',
+  theme: 'light',
   sidebarCollapsedByDefault: false,
   reminderCheckIntervalMinutes: 5,
   notificationsEnabled: true,

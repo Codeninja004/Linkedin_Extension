@@ -9,6 +9,8 @@ export type ActivityType =
   | 'temperature_changed'
   | 'tag_added'
   | 'tag_removed'
+  | 'list_added'
+  | 'list_removed'
   | 'note_updated'
   | 'reminder_created'
   | 'reminder_completed'

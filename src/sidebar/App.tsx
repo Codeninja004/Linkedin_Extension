@@ -42,13 +42,15 @@ export function SidebarApp() {
   const setSidebarOpen = useUIStore((s) => s.setSidebarOpen);
   const isDarkMode = useDarkMode();
   const loadTags = useTagTemplateStore((s) => s.loadTags);
+  const loadLists = useTagTemplateStore((s) => s.loadLists);
   const loadTemplates = useTagTemplateStore((s) => s.loadTemplates);
   const [isRedetecting, setIsRedetecting] = useState(false);
 
   useEffect(() => {
     loadTags();
+    loadLists();
     loadTemplates();
-  }, [loadTags, loadTemplates]);
+  }, [loadTags, loadLists, loadTemplates]);
 
   async function handleRedetect() {
     setIsRedetecting(true);

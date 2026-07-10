@@ -40,6 +40,7 @@ export function starterTemplatesFallback(): Record<string, Template> {
 export function createDefaultSchema(): StorageSchema {
   return {
     contacts: {},
+    lists: {},
     tags: {},
     templates: starterTemplatesFallback(),
     settings: { ...DEFAULT_SETTINGS },
